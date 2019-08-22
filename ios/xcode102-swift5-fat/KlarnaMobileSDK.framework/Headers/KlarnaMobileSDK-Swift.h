@@ -200,159 +200,60 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 @protocol KlarnaWebView;
-@class KlarnaMobileSDKError;
+@protocol KlarnaHybridSDKEventListener;
 
-/// An object that will be notified of events happening to the web views <code>KlarnaHybridSDK</code> instance
-/// is observing.
-/// If you’re performinga hybrid integration, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaHybridSDK</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inWebView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK25KlarnaHybridEventListener_")
-@protocol KlarnaHybridEventListener
-/// Event to notify the merchant app that the supplied web view will present full-screen content
-/// that it should be displayed in a full-screen format.
-/// \param webView Web view to be presented in fullscreen.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaWillShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant app that full-screen content in the supplied web view is now
-/// being displayed.
-/// \param webView Web view that has presented full-screen content.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaDidShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant’s app that the full-screen content in the following web view
-/// will be removed, and the “original” contents will be displayed.
-/// \param webView Web view to be restored to original presentation.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaWillHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that the full-screen content in the web view has been removed and
-/// it’s now displaying content in its orignal presentation.
-/// \param webView Web biew presenting content in original format.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaDidHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that an error occured during Hybrid SDK’s usage.
-/// \param webView The web view the error occured in.
-///
-/// \param error Error details.
-///
-- (void)klarnaFailedInWebView:(id <KlarnaWebView> _Nonnull)webView withError:(KlarnaMobileSDKError * _Nonnull)error;
-@end
-
-
-/// Klarna’s approach to integrating products with a “hybrid” approach: One in which Klarna’s
+/// Klarna’s solution to integrating it’s products in a “hybrid” context (one in which Klarna’s)
 /// products are presented inside a merchant-owned web view.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK15KlarnaHybridSDK")
 @interface KlarnaHybridSDK : NSObject
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-+ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
-@end
-
-@protocol KlarnaHybridSDKEventListener;
-
-@interface KlarnaHybridSDK (SWIFT_EXTENSION(KlarnaMobileSDK))
 /// Initialize the Klarna Mobile SDK in hybrid mode.
-/// warning:
-/// This initializer is deprecated. Use the new one and just initialize the SDK and
-/// add the web view you’ll be using.
-/// \param webView A web view (either <code>UIWebView</code> or <code>WKWebView</code>) for Klarna’s SDK to operate on.
+/// \param webView A web view (either UIWebView or WKWebView) for Klarna’s SDK to operate on.
 ///
 /// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
 ///
 /// \param eventListener A listener that will receive events from the SDK.
 ///
-- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener SWIFT_DEPRECATED_MSG("Use the new initializer instead.");
-/// Initialize the Klarna Mobile SDK in hybrid mode.
-/// note:
-/// After initializing the SDK, you’ll need to add the web view that the SDK will track.
-/// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
-///
-/// \param eventListener A listener that will receive events from the SDK.
-///
-- (nonnull instancetype)initWithReturnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridEventListener> _Nonnull)eventListener;
-/// Adds a web view that the SDK will keep track of until either the web view or the SDK is
-/// dereferenced.
-/// You may add multiple web views to the same instance.
-/// \param webView Web view that the SDK will keep track of (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)addWebView:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, call should be performed in:
-///     <code>webViewDidFinishLoad(_ webView:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, call should be perfomed in:
-///     <code>webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)</code>.
-///   </li>
-/// </ul>
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageLoadIn:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// warning:
-/// Use <code>newPageLoad</code> from this same class instead.
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView SWIFT_DEPRECATED_MSG("Use the `newPageLoad` instead.");
-/// Verify with the SDK whether a request/navigation should be performed in the web view.
+- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener OBJC_DESIGNATED_INITIALIZER;
+/// Notify Klarna Hybrid SDK when a new page will be loaded.
+- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView;
+/// Verify with the SDK whether a web view navigation should be followed in your web view.
+/// If using a <code>UIWebView</code>, checking should be performed in:
+/// <code>webView(_: shouldStartLoadWith: navigationType:)</code>
+/// If using a <code>WKWebView</code>, checking should be perfomed in:
+/// webView(_: decidePolicyFor: decisionHandler:)
+/// with the <code>navigationAction</code>’s <code>request</code> property.
 /// note:
 ///
 /// If it is a page Klarna recognizes as one of its own (e.g. Klarna’s financing terms), the SDK
-/// will return <code>false</code>. You should then block this navigation.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, checking should be performed in:
-///     <code>webView(_: shouldStartLoadWith: navigationType:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, checking should be perfomed in:
-///     <code>webView(_: decidePolicyFor: decisionHandler:)</code> with the <code>navigationAction</code>’s <code>request</code> property.
-///   </li>
-/// </ul>
+/// will return <code>false</code>. You should block this navigation.
 /// If it’s a page Klarna doesn’t recognize, it’ll fall back to returning <code>true</code>. Your app should
 /// determine whether it wants to load the URL through its own heuristics.
-/// \param request Request the web view will be performing.
+/// \param request the navigation action to handle
 ///
 ///
 /// returns:
-/// Whether the SDK deems that this navigation should be blocked or not.
+/// Whether the Hybrid SDK deems that this navigation should be blocked or not.
 - (BOOL)shouldFollowNavigationWithRequest:(NSURLRequest * _Nonnull)request SWIFT_WARN_UNUSED_RESULT;
 /// Retrieve the SDK’s Device ID for the app install.
-/// warning:
-/// This method is deprecated. Use the static method from <code>KlarnaMobileSDK</code> with the
-/// same name.
 ///
 /// returns:
 /// a unique ID, persistent throughout the app’s installation.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT SWIFT_DEPRECATED_MSG("Use the method of the same name on KlarnaMobileSDK instead.");
++ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 /// To be called when the application is re-opened from a third-party application while the SDK
 /// is running.
-/// warning:
-/// This method is deprecated. The SDK does not require it anymore.
 /// \param url URL that is passed in through deep link.
 ///
 /// \param options Additional system-provided parameters (like source application bundle ID)
 ///
-+ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options SWIFT_DEPRECATED_MSG("SDK does not need this to be called anymore. Will be removed in future releases.");
++ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
+@class KlarnaMobileSDKError;
 
 /// Your app should listen to SDK events in the from the Hybrid SDK by implementing this protocol.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_") SWIFT_DEPRECATED_MSG("Use KlarnaHybridEventListener instead.")
+SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_")
 @protocol KlarnaHybridSDKEventListener
 /// Event to notify the merchant app that the following web view will present content that
 /// should be displayed in a full-screen format.
@@ -406,230 +307,62 @@ typedef SWIFT_ENUM(NSInteger, KlarnaLoggingLevel, closed) {
 
 
 /// The top level interface for the SDK and all of its components.
-/// Common methods for all integrations are provided here.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK21KlarnaMobileSDKCommon")
 @interface KlarnaMobileSDKCommon : NSObject
 /// MARK: - Life Cycle
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// MARK: - Logging
-/// Set logging level for all SDK integrations.
-/// You can observe these logs either through XCode or the MacOS console.
+/// Set logging level.
 /// The default logging level is <code>error</code>.
 /// \param loggingLevel Console log output level.
 ///
 + (void)setLoggingLevel:(enum KlarnaLoggingLevel)loggingLevel;
-/// MARK: - Device identifier.
-/// Provides a device identifier for an app.
-/// The string it returns remains constant during the app’s lifetime on the app. The value does
-/// not change on updates, but will change on re-installs.
-/// The string is a UUID following the RFC 4122 version 4 standard.
-///
-/// returns:
-/// A unique persisted ID string.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 @end
 
 
-/// Describes a generic error that occurred within the SDK.
+/// A KlarnaMobileSDKError describes an error that occurred during any of the stages within the SDK.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK20KlarnaMobileSDKError")
 @interface KlarnaMobileSDKError : NSObject
+/// Unique name for this error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull name;
+/// Description of the error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull message;
+/// Informs whether this error is fatal. If an error is fatal, the payment view should not be shown any further.
+@property (nonatomic, readonly) BOOL isFatal;
 @property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
-
-/// An SDK error specific to the Klarna Payments component.
-SWIFT_CLASS("_TtC15KlarnaMobileSDK18KlarnaPaymentError")
-@interface KlarnaPaymentError : KlarnaMobileSDKError
-@end
-
-@class KlarnaPaymentView;
-
-/// An object that will be notified of events happening to a <code>KlarnaPaymentView</code>
-/// If you’re integrating Klarna Payments natively, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaPaymentView</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inPaymentView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK26KlarnaPaymentEventListener_")
-@protocol KlarnaPaymentEventListener
-/// The <code>initialize()</code> function for this payment view was successful.
-/// You can follow up by calling <code>load()</code> to render details for this method, or if this payment
-/// method is already authorized, <code>loadPaymentReview()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was initialized.
-///
-- (void)klarnaInitializedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>load()</code> function for this payment view was successful.
-/// Payment view should be visible now. If the user chooses to pay with the payment method in
-/// this view, call <code>authorize()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was loaded.
-///
-- (void)klarnaLoadedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>loadPaymentReview()</code> function for this payment view was successful.
-/// Payment view is rendering a description of what the payment method that was authorized.
-/// \param paymentView The <code>KlarnaPaymentView</code> that renders a payment review.
-///
-- (void)klarnaLoadedPaymentReviewWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// An authorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// note:
-/// This method being called doesn’t necessarily mean that it was successful. You might need
-/// to call <code>finalize()</code>, you might need to correct an error or there might be a fatal error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the authorized payment method.
-///
-/// \param approved Is the session approved? If true, you should also get an <code>authToken</code>.
-///
-/// \param authToken Authorization token.
-///
-/// \param finalizeRequired If true, <code>finalize()</code> needs to be called.
-///
-- (void)klarnaAuthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken finalizeRequired:(BOOL)finalizeRequired;
-/// A reauthorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// If the order is changed after this point. Call the view’s <code>reauthorize()</code> instead
-/// of calling <code>authorize()</code> again.
-/// note:
-/// This method being called doesn’t mean that it was necessarily successful. If <code>klarnaAuthorized()</code>
-/// previously returned true for <code>finalizeRequired</code>, you need to still call <code>finalize()</code>. There
-/// might also be an error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the reauthorized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaReauthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// The session for the payment method in this view has performed a finalize.
-/// If it’s approved and you have an authorization token, you can create an order.
-/// note:
-/// You need to check for the <code>authToken</code> to make sure the session is finalized.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the finalized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaFinalizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// Called when a Payment View resized internally.
-/// Update your constraints (or whatever solution you have) to match the layout.
-/// \param paymentView The <code>KlarnaPaymentView</code> that resized.
-///
-/// \param newHeight The new height in points.
-///
-- (void)klarnaResizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView to:(CGFloat)newHeight;
-/// Called if an error occured during some part of the flow.
-/// If the error’s <code>invalidFields</code> property contains field names and the error isn’t fatal, you can:
-/// <ol>
-///   <li>
-///     Prompt the user to get updated info for those fields.
-///   </li>
-///   <li>
-///     Call the same method with those updated fields as additional data.
-///   </li>
-/// </ol>
-/// warning:
-/// Errors may or may not be fatal. If the error is fatal the <code>KlarnaPaymentView</code> should not be
-/// displayed anymore.
-/// \param paymentView The <code>KlarnaPaymentView</code> that the error occured in.
-///
-/// \param error Error that occurred.
-///
-- (void)klarnaFailedInPaymentView:(KlarnaPaymentView * _Nonnull)paymentView withError:(KlarnaPaymentError * _Nonnull)error;
-@end
-
 @class NSCoder;
 
+/// A <code>UIView</code> rendering one of Klarna’s Payment Method Categories.
+/// In addition to rendering a PMC. it also acts as an interface to perform operations on the
+/// PMC it’s rendering.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK17KlarnaPaymentView")
 @interface KlarnaPaymentView : UIView
 /// Mark <code>init(frame:)</code> as <code>private</code> to prevent it being used to initialize the payment view.
 - (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder SWIFT_UNAVAILABLE;
+/// Klarna payment view does not support initialization from storyboard or xib files.
+/// note:
+///
+/// You should never need to initialize a <code>KlarnaPaymentView</code> yourself,
+/// Use <code>KlarnaPaymets</code>’s factory method to make a new instance of <code>KlarnaPaymentView</code>.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
-@interface KlarnaPaymentView (SWIFT_EXTENSION(KlarnaMobileSDK))
-/// Payment method category this view will be / is displaying.
-@property (nonatomic, readonly, copy) NSString * _Nonnull category;
-/// Informs whether this <code>KlarnaPaymentView</code> should be displayed to the customer.
-/// True by default. Once it becomes false, it will not become true again.
-@property (nonatomic, readonly) BOOL isLoaded;
-/// Informs whether this PaymentView’s content is loaded.
-/// Will be false until a successful load() call has been performed.
-@property (nonatomic, readonly) BOOL isAvalable;
-/// Create a Klarna Payment View
-/// note:
-///
-/// Klarna payment view will be initialized with frame <code>.zero</code>,
-/// auto layout is the recommended way to manage the view’s layout.
-/// note:
-///
-/// When the payment view is initialized, this initializer <em>wont</em> call <code>initialize()</code>
-/// automatically. You need to call initialize yourself.
-/// \param category Category of payment methods to be loaded.
-///
-/// \param delegate A listener object that will receive events from this view.
-///
-- (nonnull instancetype)initWithCategory:(NSString * _Nonnull)category eventListener:(id <KlarnaPaymentEventListener> _Nonnull)eventListener;
-/// Initialize the <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// <em>Only</em> call this separately when you get a <code>invalidClientToken</code> error.
-/// \param clientToken Client token received from Klarna when creating the session.
-///
-/// \param returnUrl Your apps custom URL scheme <code>CFBundleURLSchemes</code>.
-///
-- (void)initializeWithClientToken:(NSString * _Nonnull)clientToken returnUrl:(NSURL * _Nonnull)returnUrl;
-/// Performs a pre-assessment for this payment method category. Loads content into the
-/// <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// \param jsonData An optional string with order data to update the session. Formatted as JSON.
-///
-- (void)loadWithJsonData:(NSString * _Nullable)jsonData;
-/// Renders an overview of the payment terms that have been authorized.
-/// If your checkout offers the customer an opportunity to review the order after the payment
-/// step (e.g. an order review page) it can make sense to present the payment method the customer
-/// selected on a previous page.
-/// This gives the customer a change to review the payment method and its terms to the user.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// note:
-///
-/// Currently only specific payment methods and countries may be supported.
-/// warning:
-///
-/// The session should be authorized.
-- (void)loadPaymentReview;
-/// Authorizes the session and evaluates whether an order can be created.
-/// Merchant’s delegate will be called with successful/unsuccessful result of authorization.
-/// \param autoFinalize An optional flag used to turn off auto-finalization for the direct bank transfer payment method.
-///
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)authorizeWithAutoFinalize:(BOOL)autoFinalize jsonData:(NSString * _Nullable)jsonData;
-/// Reauthorizes the session.
-/// Call this if session details (order or customer info) have changed after authorization.
-/// Merchant’s delegate will be called with successful/unsuccessful result of reauthorization.
-/// \param jsonData An optional json string to update the session.
-///
-- (void)reauthorizeWithJsonData:(NSString * _Nullable)jsonData;
-/// Finalizes the session.
-/// Call this if you called <code>authorize()</code> with <code>autoFinalize</code> set to <code>false</code> and results in
-/// <code>finalizeRequired</code> with a <code>true</code> value.
-/// Merchant’s delegate will be called with successful/unsuccessful result of finalization.
-/// note:
-///
-/// Method is called <code>finalise</code> with an “s” to avoid conflicts with the <code>NSObject</code> method of
-/// the same name.
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)finaliseWithJsonData:(NSString * _Nullable)jsonData;
+
+
+
+
+/// A KlarnaPaymentError describes an error that occurred during any of the stages within the SDK.
+SWIFT_CLASS("_TtC15KlarnaMobileSDK19KlarnaPaymentsError")
+@interface KlarnaPaymentsError : NSObject
+@property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
 
@@ -872,159 +605,60 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 @protocol KlarnaWebView;
-@class KlarnaMobileSDKError;
+@protocol KlarnaHybridSDKEventListener;
 
-/// An object that will be notified of events happening to the web views <code>KlarnaHybridSDK</code> instance
-/// is observing.
-/// If you’re performinga hybrid integration, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaHybridSDK</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inWebView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK25KlarnaHybridEventListener_")
-@protocol KlarnaHybridEventListener
-/// Event to notify the merchant app that the supplied web view will present full-screen content
-/// that it should be displayed in a full-screen format.
-/// \param webView Web view to be presented in fullscreen.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaWillShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant app that full-screen content in the supplied web view is now
-/// being displayed.
-/// \param webView Web view that has presented full-screen content.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaDidShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant’s app that the full-screen content in the following web view
-/// will be removed, and the “original” contents will be displayed.
-/// \param webView Web view to be restored to original presentation.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaWillHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that the full-screen content in the web view has been removed and
-/// it’s now displaying content in its orignal presentation.
-/// \param webView Web biew presenting content in original format.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaDidHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that an error occured during Hybrid SDK’s usage.
-/// \param webView The web view the error occured in.
-///
-/// \param error Error details.
-///
-- (void)klarnaFailedInWebView:(id <KlarnaWebView> _Nonnull)webView withError:(KlarnaMobileSDKError * _Nonnull)error;
-@end
-
-
-/// Klarna’s approach to integrating products with a “hybrid” approach: One in which Klarna’s
+/// Klarna’s solution to integrating it’s products in a “hybrid” context (one in which Klarna’s)
 /// products are presented inside a merchant-owned web view.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK15KlarnaHybridSDK")
 @interface KlarnaHybridSDK : NSObject
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-+ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
-@end
-
-@protocol KlarnaHybridSDKEventListener;
-
-@interface KlarnaHybridSDK (SWIFT_EXTENSION(KlarnaMobileSDK))
 /// Initialize the Klarna Mobile SDK in hybrid mode.
-/// warning:
-/// This initializer is deprecated. Use the new one and just initialize the SDK and
-/// add the web view you’ll be using.
-/// \param webView A web view (either <code>UIWebView</code> or <code>WKWebView</code>) for Klarna’s SDK to operate on.
+/// \param webView A web view (either UIWebView or WKWebView) for Klarna’s SDK to operate on.
 ///
 /// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
 ///
 /// \param eventListener A listener that will receive events from the SDK.
 ///
-- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener SWIFT_DEPRECATED_MSG("Use the new initializer instead.");
-/// Initialize the Klarna Mobile SDK in hybrid mode.
-/// note:
-/// After initializing the SDK, you’ll need to add the web view that the SDK will track.
-/// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
-///
-/// \param eventListener A listener that will receive events from the SDK.
-///
-- (nonnull instancetype)initWithReturnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridEventListener> _Nonnull)eventListener;
-/// Adds a web view that the SDK will keep track of until either the web view or the SDK is
-/// dereferenced.
-/// You may add multiple web views to the same instance.
-/// \param webView Web view that the SDK will keep track of (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)addWebView:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, call should be performed in:
-///     <code>webViewDidFinishLoad(_ webView:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, call should be perfomed in:
-///     <code>webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)</code>.
-///   </li>
-/// </ul>
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageLoadIn:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// warning:
-/// Use <code>newPageLoad</code> from this same class instead.
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView SWIFT_DEPRECATED_MSG("Use the `newPageLoad` instead.");
-/// Verify with the SDK whether a request/navigation should be performed in the web view.
+- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener OBJC_DESIGNATED_INITIALIZER;
+/// Notify Klarna Hybrid SDK when a new page will be loaded.
+- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView;
+/// Verify with the SDK whether a web view navigation should be followed in your web view.
+/// If using a <code>UIWebView</code>, checking should be performed in:
+/// <code>webView(_: shouldStartLoadWith: navigationType:)</code>
+/// If using a <code>WKWebView</code>, checking should be perfomed in:
+/// webView(_: decidePolicyFor: decisionHandler:)
+/// with the <code>navigationAction</code>’s <code>request</code> property.
 /// note:
 ///
 /// If it is a page Klarna recognizes as one of its own (e.g. Klarna’s financing terms), the SDK
-/// will return <code>false</code>. You should then block this navigation.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, checking should be performed in:
-///     <code>webView(_: shouldStartLoadWith: navigationType:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, checking should be perfomed in:
-///     <code>webView(_: decidePolicyFor: decisionHandler:)</code> with the <code>navigationAction</code>’s <code>request</code> property.
-///   </li>
-/// </ul>
+/// will return <code>false</code>. You should block this navigation.
 /// If it’s a page Klarna doesn’t recognize, it’ll fall back to returning <code>true</code>. Your app should
 /// determine whether it wants to load the URL through its own heuristics.
-/// \param request Request the web view will be performing.
+/// \param request the navigation action to handle
 ///
 ///
 /// returns:
-/// Whether the SDK deems that this navigation should be blocked or not.
+/// Whether the Hybrid SDK deems that this navigation should be blocked or not.
 - (BOOL)shouldFollowNavigationWithRequest:(NSURLRequest * _Nonnull)request SWIFT_WARN_UNUSED_RESULT;
 /// Retrieve the SDK’s Device ID for the app install.
-/// warning:
-/// This method is deprecated. Use the static method from <code>KlarnaMobileSDK</code> with the
-/// same name.
 ///
 /// returns:
 /// a unique ID, persistent throughout the app’s installation.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT SWIFT_DEPRECATED_MSG("Use the method of the same name on KlarnaMobileSDK instead.");
++ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 /// To be called when the application is re-opened from a third-party application while the SDK
 /// is running.
-/// warning:
-/// This method is deprecated. The SDK does not require it anymore.
 /// \param url URL that is passed in through deep link.
 ///
 /// \param options Additional system-provided parameters (like source application bundle ID)
 ///
-+ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options SWIFT_DEPRECATED_MSG("SDK does not need this to be called anymore. Will be removed in future releases.");
++ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
+@class KlarnaMobileSDKError;
 
 /// Your app should listen to SDK events in the from the Hybrid SDK by implementing this protocol.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_") SWIFT_DEPRECATED_MSG("Use KlarnaHybridEventListener instead.")
+SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_")
 @protocol KlarnaHybridSDKEventListener
 /// Event to notify the merchant app that the following web view will present content that
 /// should be displayed in a full-screen format.
@@ -1078,230 +712,62 @@ typedef SWIFT_ENUM(NSInteger, KlarnaLoggingLevel, closed) {
 
 
 /// The top level interface for the SDK and all of its components.
-/// Common methods for all integrations are provided here.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK21KlarnaMobileSDKCommon")
 @interface KlarnaMobileSDKCommon : NSObject
 /// MARK: - Life Cycle
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// MARK: - Logging
-/// Set logging level for all SDK integrations.
-/// You can observe these logs either through XCode or the MacOS console.
+/// Set logging level.
 /// The default logging level is <code>error</code>.
 /// \param loggingLevel Console log output level.
 ///
 + (void)setLoggingLevel:(enum KlarnaLoggingLevel)loggingLevel;
-/// MARK: - Device identifier.
-/// Provides a device identifier for an app.
-/// The string it returns remains constant during the app’s lifetime on the app. The value does
-/// not change on updates, but will change on re-installs.
-/// The string is a UUID following the RFC 4122 version 4 standard.
-///
-/// returns:
-/// A unique persisted ID string.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 @end
 
 
-/// Describes a generic error that occurred within the SDK.
+/// A KlarnaMobileSDKError describes an error that occurred during any of the stages within the SDK.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK20KlarnaMobileSDKError")
 @interface KlarnaMobileSDKError : NSObject
+/// Unique name for this error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull name;
+/// Description of the error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull message;
+/// Informs whether this error is fatal. If an error is fatal, the payment view should not be shown any further.
+@property (nonatomic, readonly) BOOL isFatal;
 @property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
-
-/// An SDK error specific to the Klarna Payments component.
-SWIFT_CLASS("_TtC15KlarnaMobileSDK18KlarnaPaymentError")
-@interface KlarnaPaymentError : KlarnaMobileSDKError
-@end
-
-@class KlarnaPaymentView;
-
-/// An object that will be notified of events happening to a <code>KlarnaPaymentView</code>
-/// If you’re integrating Klarna Payments natively, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaPaymentView</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inPaymentView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK26KlarnaPaymentEventListener_")
-@protocol KlarnaPaymentEventListener
-/// The <code>initialize()</code> function for this payment view was successful.
-/// You can follow up by calling <code>load()</code> to render details for this method, or if this payment
-/// method is already authorized, <code>loadPaymentReview()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was initialized.
-///
-- (void)klarnaInitializedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>load()</code> function for this payment view was successful.
-/// Payment view should be visible now. If the user chooses to pay with the payment method in
-/// this view, call <code>authorize()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was loaded.
-///
-- (void)klarnaLoadedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>loadPaymentReview()</code> function for this payment view was successful.
-/// Payment view is rendering a description of what the payment method that was authorized.
-/// \param paymentView The <code>KlarnaPaymentView</code> that renders a payment review.
-///
-- (void)klarnaLoadedPaymentReviewWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// An authorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// note:
-/// This method being called doesn’t necessarily mean that it was successful. You might need
-/// to call <code>finalize()</code>, you might need to correct an error or there might be a fatal error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the authorized payment method.
-///
-/// \param approved Is the session approved? If true, you should also get an <code>authToken</code>.
-///
-/// \param authToken Authorization token.
-///
-/// \param finalizeRequired If true, <code>finalize()</code> needs to be called.
-///
-- (void)klarnaAuthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken finalizeRequired:(BOOL)finalizeRequired;
-/// A reauthorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// If the order is changed after this point. Call the view’s <code>reauthorize()</code> instead
-/// of calling <code>authorize()</code> again.
-/// note:
-/// This method being called doesn’t mean that it was necessarily successful. If <code>klarnaAuthorized()</code>
-/// previously returned true for <code>finalizeRequired</code>, you need to still call <code>finalize()</code>. There
-/// might also be an error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the reauthorized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaReauthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// The session for the payment method in this view has performed a finalize.
-/// If it’s approved and you have an authorization token, you can create an order.
-/// note:
-/// You need to check for the <code>authToken</code> to make sure the session is finalized.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the finalized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaFinalizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// Called when a Payment View resized internally.
-/// Update your constraints (or whatever solution you have) to match the layout.
-/// \param paymentView The <code>KlarnaPaymentView</code> that resized.
-///
-/// \param newHeight The new height in points.
-///
-- (void)klarnaResizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView to:(CGFloat)newHeight;
-/// Called if an error occured during some part of the flow.
-/// If the error’s <code>invalidFields</code> property contains field names and the error isn’t fatal, you can:
-/// <ol>
-///   <li>
-///     Prompt the user to get updated info for those fields.
-///   </li>
-///   <li>
-///     Call the same method with those updated fields as additional data.
-///   </li>
-/// </ol>
-/// warning:
-/// Errors may or may not be fatal. If the error is fatal the <code>KlarnaPaymentView</code> should not be
-/// displayed anymore.
-/// \param paymentView The <code>KlarnaPaymentView</code> that the error occured in.
-///
-/// \param error Error that occurred.
-///
-- (void)klarnaFailedInPaymentView:(KlarnaPaymentView * _Nonnull)paymentView withError:(KlarnaPaymentError * _Nonnull)error;
-@end
-
 @class NSCoder;
 
+/// A <code>UIView</code> rendering one of Klarna’s Payment Method Categories.
+/// In addition to rendering a PMC. it also acts as an interface to perform operations on the
+/// PMC it’s rendering.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK17KlarnaPaymentView")
 @interface KlarnaPaymentView : UIView
 /// Mark <code>init(frame:)</code> as <code>private</code> to prevent it being used to initialize the payment view.
 - (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder SWIFT_UNAVAILABLE;
+/// Klarna payment view does not support initialization from storyboard or xib files.
+/// note:
+///
+/// You should never need to initialize a <code>KlarnaPaymentView</code> yourself,
+/// Use <code>KlarnaPaymets</code>’s factory method to make a new instance of <code>KlarnaPaymentView</code>.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
-@interface KlarnaPaymentView (SWIFT_EXTENSION(KlarnaMobileSDK))
-/// Payment method category this view will be / is displaying.
-@property (nonatomic, readonly, copy) NSString * _Nonnull category;
-/// Informs whether this <code>KlarnaPaymentView</code> should be displayed to the customer.
-/// True by default. Once it becomes false, it will not become true again.
-@property (nonatomic, readonly) BOOL isLoaded;
-/// Informs whether this PaymentView’s content is loaded.
-/// Will be false until a successful load() call has been performed.
-@property (nonatomic, readonly) BOOL isAvalable;
-/// Create a Klarna Payment View
-/// note:
-///
-/// Klarna payment view will be initialized with frame <code>.zero</code>,
-/// auto layout is the recommended way to manage the view’s layout.
-/// note:
-///
-/// When the payment view is initialized, this initializer <em>wont</em> call <code>initialize()</code>
-/// automatically. You need to call initialize yourself.
-/// \param category Category of payment methods to be loaded.
-///
-/// \param delegate A listener object that will receive events from this view.
-///
-- (nonnull instancetype)initWithCategory:(NSString * _Nonnull)category eventListener:(id <KlarnaPaymentEventListener> _Nonnull)eventListener;
-/// Initialize the <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// <em>Only</em> call this separately when you get a <code>invalidClientToken</code> error.
-/// \param clientToken Client token received from Klarna when creating the session.
-///
-/// \param returnUrl Your apps custom URL scheme <code>CFBundleURLSchemes</code>.
-///
-- (void)initializeWithClientToken:(NSString * _Nonnull)clientToken returnUrl:(NSURL * _Nonnull)returnUrl;
-/// Performs a pre-assessment for this payment method category. Loads content into the
-/// <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// \param jsonData An optional string with order data to update the session. Formatted as JSON.
-///
-- (void)loadWithJsonData:(NSString * _Nullable)jsonData;
-/// Renders an overview of the payment terms that have been authorized.
-/// If your checkout offers the customer an opportunity to review the order after the payment
-/// step (e.g. an order review page) it can make sense to present the payment method the customer
-/// selected on a previous page.
-/// This gives the customer a change to review the payment method and its terms to the user.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// note:
-///
-/// Currently only specific payment methods and countries may be supported.
-/// warning:
-///
-/// The session should be authorized.
-- (void)loadPaymentReview;
-/// Authorizes the session and evaluates whether an order can be created.
-/// Merchant’s delegate will be called with successful/unsuccessful result of authorization.
-/// \param autoFinalize An optional flag used to turn off auto-finalization for the direct bank transfer payment method.
-///
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)authorizeWithAutoFinalize:(BOOL)autoFinalize jsonData:(NSString * _Nullable)jsonData;
-/// Reauthorizes the session.
-/// Call this if session details (order or customer info) have changed after authorization.
-/// Merchant’s delegate will be called with successful/unsuccessful result of reauthorization.
-/// \param jsonData An optional json string to update the session.
-///
-- (void)reauthorizeWithJsonData:(NSString * _Nullable)jsonData;
-/// Finalizes the session.
-/// Call this if you called <code>authorize()</code> with <code>autoFinalize</code> set to <code>false</code> and results in
-/// <code>finalizeRequired</code> with a <code>true</code> value.
-/// Merchant’s delegate will be called with successful/unsuccessful result of finalization.
-/// note:
-///
-/// Method is called <code>finalise</code> with an “s” to avoid conflicts with the <code>NSObject</code> method of
-/// the same name.
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)finaliseWithJsonData:(NSString * _Nullable)jsonData;
+
+
+
+
+/// A KlarnaPaymentError describes an error that occurred during any of the stages within the SDK.
+SWIFT_CLASS("_TtC15KlarnaMobileSDK19KlarnaPaymentsError")
+@interface KlarnaPaymentsError : NSObject
+@property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
 
@@ -1548,159 +1014,60 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 @protocol KlarnaWebView;
-@class KlarnaMobileSDKError;
+@protocol KlarnaHybridSDKEventListener;
 
-/// An object that will be notified of events happening to the web views <code>KlarnaHybridSDK</code> instance
-/// is observing.
-/// If you’re performinga hybrid integration, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaHybridSDK</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inWebView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK25KlarnaHybridEventListener_")
-@protocol KlarnaHybridEventListener
-/// Event to notify the merchant app that the supplied web view will present full-screen content
-/// that it should be displayed in a full-screen format.
-/// \param webView Web view to be presented in fullscreen.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaWillShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant app that full-screen content in the supplied web view is now
-/// being displayed.
-/// \param webView Web view that has presented full-screen content.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaDidShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant’s app that the full-screen content in the following web view
-/// will be removed, and the “original” contents will be displayed.
-/// \param webView Web view to be restored to original presentation.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaWillHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that the full-screen content in the web view has been removed and
-/// it’s now displaying content in its orignal presentation.
-/// \param webView Web biew presenting content in original format.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaDidHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that an error occured during Hybrid SDK’s usage.
-/// \param webView The web view the error occured in.
-///
-/// \param error Error details.
-///
-- (void)klarnaFailedInWebView:(id <KlarnaWebView> _Nonnull)webView withError:(KlarnaMobileSDKError * _Nonnull)error;
-@end
-
-
-/// Klarna’s approach to integrating products with a “hybrid” approach: One in which Klarna’s
+/// Klarna’s solution to integrating it’s products in a “hybrid” context (one in which Klarna’s)
 /// products are presented inside a merchant-owned web view.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK15KlarnaHybridSDK")
 @interface KlarnaHybridSDK : NSObject
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-+ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
-@end
-
-@protocol KlarnaHybridSDKEventListener;
-
-@interface KlarnaHybridSDK (SWIFT_EXTENSION(KlarnaMobileSDK))
 /// Initialize the Klarna Mobile SDK in hybrid mode.
-/// warning:
-/// This initializer is deprecated. Use the new one and just initialize the SDK and
-/// add the web view you’ll be using.
-/// \param webView A web view (either <code>UIWebView</code> or <code>WKWebView</code>) for Klarna’s SDK to operate on.
+/// \param webView A web view (either UIWebView or WKWebView) for Klarna’s SDK to operate on.
 ///
 /// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
 ///
 /// \param eventListener A listener that will receive events from the SDK.
 ///
-- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener SWIFT_DEPRECATED_MSG("Use the new initializer instead.");
-/// Initialize the Klarna Mobile SDK in hybrid mode.
-/// note:
-/// After initializing the SDK, you’ll need to add the web view that the SDK will track.
-/// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
-///
-/// \param eventListener A listener that will receive events from the SDK.
-///
-- (nonnull instancetype)initWithReturnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridEventListener> _Nonnull)eventListener;
-/// Adds a web view that the SDK will keep track of until either the web view or the SDK is
-/// dereferenced.
-/// You may add multiple web views to the same instance.
-/// \param webView Web view that the SDK will keep track of (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)addWebView:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, call should be performed in:
-///     <code>webViewDidFinishLoad(_ webView:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, call should be perfomed in:
-///     <code>webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)</code>.
-///   </li>
-/// </ul>
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageLoadIn:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// warning:
-/// Use <code>newPageLoad</code> from this same class instead.
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView SWIFT_DEPRECATED_MSG("Use the `newPageLoad` instead.");
-/// Verify with the SDK whether a request/navigation should be performed in the web view.
+- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener OBJC_DESIGNATED_INITIALIZER;
+/// Notify Klarna Hybrid SDK when a new page will be loaded.
+- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView;
+/// Verify with the SDK whether a web view navigation should be followed in your web view.
+/// If using a <code>UIWebView</code>, checking should be performed in:
+/// <code>webView(_: shouldStartLoadWith: navigationType:)</code>
+/// If using a <code>WKWebView</code>, checking should be perfomed in:
+/// webView(_: decidePolicyFor: decisionHandler:)
+/// with the <code>navigationAction</code>’s <code>request</code> property.
 /// note:
 ///
 /// If it is a page Klarna recognizes as one of its own (e.g. Klarna’s financing terms), the SDK
-/// will return <code>false</code>. You should then block this navigation.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, checking should be performed in:
-///     <code>webView(_: shouldStartLoadWith: navigationType:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, checking should be perfomed in:
-///     <code>webView(_: decidePolicyFor: decisionHandler:)</code> with the <code>navigationAction</code>’s <code>request</code> property.
-///   </li>
-/// </ul>
+/// will return <code>false</code>. You should block this navigation.
 /// If it’s a page Klarna doesn’t recognize, it’ll fall back to returning <code>true</code>. Your app should
 /// determine whether it wants to load the URL through its own heuristics.
-/// \param request Request the web view will be performing.
+/// \param request the navigation action to handle
 ///
 ///
 /// returns:
-/// Whether the SDK deems that this navigation should be blocked or not.
+/// Whether the Hybrid SDK deems that this navigation should be blocked or not.
 - (BOOL)shouldFollowNavigationWithRequest:(NSURLRequest * _Nonnull)request SWIFT_WARN_UNUSED_RESULT;
 /// Retrieve the SDK’s Device ID for the app install.
-/// warning:
-/// This method is deprecated. Use the static method from <code>KlarnaMobileSDK</code> with the
-/// same name.
 ///
 /// returns:
 /// a unique ID, persistent throughout the app’s installation.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT SWIFT_DEPRECATED_MSG("Use the method of the same name on KlarnaMobileSDK instead.");
++ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 /// To be called when the application is re-opened from a third-party application while the SDK
 /// is running.
-/// warning:
-/// This method is deprecated. The SDK does not require it anymore.
 /// \param url URL that is passed in through deep link.
 ///
 /// \param options Additional system-provided parameters (like source application bundle ID)
 ///
-+ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options SWIFT_DEPRECATED_MSG("SDK does not need this to be called anymore. Will be removed in future releases.");
++ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
+@class KlarnaMobileSDKError;
 
 /// Your app should listen to SDK events in the from the Hybrid SDK by implementing this protocol.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_") SWIFT_DEPRECATED_MSG("Use KlarnaHybridEventListener instead.")
+SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_")
 @protocol KlarnaHybridSDKEventListener
 /// Event to notify the merchant app that the following web view will present content that
 /// should be displayed in a full-screen format.
@@ -1754,230 +1121,62 @@ typedef SWIFT_ENUM(NSInteger, KlarnaLoggingLevel, closed) {
 
 
 /// The top level interface for the SDK and all of its components.
-/// Common methods for all integrations are provided here.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK21KlarnaMobileSDKCommon")
 @interface KlarnaMobileSDKCommon : NSObject
 /// MARK: - Life Cycle
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// MARK: - Logging
-/// Set logging level for all SDK integrations.
-/// You can observe these logs either through XCode or the MacOS console.
+/// Set logging level.
 /// The default logging level is <code>error</code>.
 /// \param loggingLevel Console log output level.
 ///
 + (void)setLoggingLevel:(enum KlarnaLoggingLevel)loggingLevel;
-/// MARK: - Device identifier.
-/// Provides a device identifier for an app.
-/// The string it returns remains constant during the app’s lifetime on the app. The value does
-/// not change on updates, but will change on re-installs.
-/// The string is a UUID following the RFC 4122 version 4 standard.
-///
-/// returns:
-/// A unique persisted ID string.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 @end
 
 
-/// Describes a generic error that occurred within the SDK.
+/// A KlarnaMobileSDKError describes an error that occurred during any of the stages within the SDK.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK20KlarnaMobileSDKError")
 @interface KlarnaMobileSDKError : NSObject
+/// Unique name for this error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull name;
+/// Description of the error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull message;
+/// Informs whether this error is fatal. If an error is fatal, the payment view should not be shown any further.
+@property (nonatomic, readonly) BOOL isFatal;
 @property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
-
-/// An SDK error specific to the Klarna Payments component.
-SWIFT_CLASS("_TtC15KlarnaMobileSDK18KlarnaPaymentError")
-@interface KlarnaPaymentError : KlarnaMobileSDKError
-@end
-
-@class KlarnaPaymentView;
-
-/// An object that will be notified of events happening to a <code>KlarnaPaymentView</code>
-/// If you’re integrating Klarna Payments natively, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaPaymentView</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inPaymentView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK26KlarnaPaymentEventListener_")
-@protocol KlarnaPaymentEventListener
-/// The <code>initialize()</code> function for this payment view was successful.
-/// You can follow up by calling <code>load()</code> to render details for this method, or if this payment
-/// method is already authorized, <code>loadPaymentReview()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was initialized.
-///
-- (void)klarnaInitializedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>load()</code> function for this payment view was successful.
-/// Payment view should be visible now. If the user chooses to pay with the payment method in
-/// this view, call <code>authorize()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was loaded.
-///
-- (void)klarnaLoadedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>loadPaymentReview()</code> function for this payment view was successful.
-/// Payment view is rendering a description of what the payment method that was authorized.
-/// \param paymentView The <code>KlarnaPaymentView</code> that renders a payment review.
-///
-- (void)klarnaLoadedPaymentReviewWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// An authorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// note:
-/// This method being called doesn’t necessarily mean that it was successful. You might need
-/// to call <code>finalize()</code>, you might need to correct an error or there might be a fatal error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the authorized payment method.
-///
-/// \param approved Is the session approved? If true, you should also get an <code>authToken</code>.
-///
-/// \param authToken Authorization token.
-///
-/// \param finalizeRequired If true, <code>finalize()</code> needs to be called.
-///
-- (void)klarnaAuthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken finalizeRequired:(BOOL)finalizeRequired;
-/// A reauthorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// If the order is changed after this point. Call the view’s <code>reauthorize()</code> instead
-/// of calling <code>authorize()</code> again.
-/// note:
-/// This method being called doesn’t mean that it was necessarily successful. If <code>klarnaAuthorized()</code>
-/// previously returned true for <code>finalizeRequired</code>, you need to still call <code>finalize()</code>. There
-/// might also be an error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the reauthorized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaReauthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// The session for the payment method in this view has performed a finalize.
-/// If it’s approved and you have an authorization token, you can create an order.
-/// note:
-/// You need to check for the <code>authToken</code> to make sure the session is finalized.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the finalized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaFinalizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// Called when a Payment View resized internally.
-/// Update your constraints (or whatever solution you have) to match the layout.
-/// \param paymentView The <code>KlarnaPaymentView</code> that resized.
-///
-/// \param newHeight The new height in points.
-///
-- (void)klarnaResizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView to:(CGFloat)newHeight;
-/// Called if an error occured during some part of the flow.
-/// If the error’s <code>invalidFields</code> property contains field names and the error isn’t fatal, you can:
-/// <ol>
-///   <li>
-///     Prompt the user to get updated info for those fields.
-///   </li>
-///   <li>
-///     Call the same method with those updated fields as additional data.
-///   </li>
-/// </ol>
-/// warning:
-/// Errors may or may not be fatal. If the error is fatal the <code>KlarnaPaymentView</code> should not be
-/// displayed anymore.
-/// \param paymentView The <code>KlarnaPaymentView</code> that the error occured in.
-///
-/// \param error Error that occurred.
-///
-- (void)klarnaFailedInPaymentView:(KlarnaPaymentView * _Nonnull)paymentView withError:(KlarnaPaymentError * _Nonnull)error;
-@end
-
 @class NSCoder;
 
+/// A <code>UIView</code> rendering one of Klarna’s Payment Method Categories.
+/// In addition to rendering a PMC. it also acts as an interface to perform operations on the
+/// PMC it’s rendering.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK17KlarnaPaymentView")
 @interface KlarnaPaymentView : UIView
 /// Mark <code>init(frame:)</code> as <code>private</code> to prevent it being used to initialize the payment view.
 - (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder SWIFT_UNAVAILABLE;
+/// Klarna payment view does not support initialization from storyboard or xib files.
+/// note:
+///
+/// You should never need to initialize a <code>KlarnaPaymentView</code> yourself,
+/// Use <code>KlarnaPaymets</code>’s factory method to make a new instance of <code>KlarnaPaymentView</code>.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
-@interface KlarnaPaymentView (SWIFT_EXTENSION(KlarnaMobileSDK))
-/// Payment method category this view will be / is displaying.
-@property (nonatomic, readonly, copy) NSString * _Nonnull category;
-/// Informs whether this <code>KlarnaPaymentView</code> should be displayed to the customer.
-/// True by default. Once it becomes false, it will not become true again.
-@property (nonatomic, readonly) BOOL isLoaded;
-/// Informs whether this PaymentView’s content is loaded.
-/// Will be false until a successful load() call has been performed.
-@property (nonatomic, readonly) BOOL isAvalable;
-/// Create a Klarna Payment View
-/// note:
-///
-/// Klarna payment view will be initialized with frame <code>.zero</code>,
-/// auto layout is the recommended way to manage the view’s layout.
-/// note:
-///
-/// When the payment view is initialized, this initializer <em>wont</em> call <code>initialize()</code>
-/// automatically. You need to call initialize yourself.
-/// \param category Category of payment methods to be loaded.
-///
-/// \param delegate A listener object that will receive events from this view.
-///
-- (nonnull instancetype)initWithCategory:(NSString * _Nonnull)category eventListener:(id <KlarnaPaymentEventListener> _Nonnull)eventListener;
-/// Initialize the <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// <em>Only</em> call this separately when you get a <code>invalidClientToken</code> error.
-/// \param clientToken Client token received from Klarna when creating the session.
-///
-/// \param returnUrl Your apps custom URL scheme <code>CFBundleURLSchemes</code>.
-///
-- (void)initializeWithClientToken:(NSString * _Nonnull)clientToken returnUrl:(NSURL * _Nonnull)returnUrl;
-/// Performs a pre-assessment for this payment method category. Loads content into the
-/// <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// \param jsonData An optional string with order data to update the session. Formatted as JSON.
-///
-- (void)loadWithJsonData:(NSString * _Nullable)jsonData;
-/// Renders an overview of the payment terms that have been authorized.
-/// If your checkout offers the customer an opportunity to review the order after the payment
-/// step (e.g. an order review page) it can make sense to present the payment method the customer
-/// selected on a previous page.
-/// This gives the customer a change to review the payment method and its terms to the user.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// note:
-///
-/// Currently only specific payment methods and countries may be supported.
-/// warning:
-///
-/// The session should be authorized.
-- (void)loadPaymentReview;
-/// Authorizes the session and evaluates whether an order can be created.
-/// Merchant’s delegate will be called with successful/unsuccessful result of authorization.
-/// \param autoFinalize An optional flag used to turn off auto-finalization for the direct bank transfer payment method.
-///
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)authorizeWithAutoFinalize:(BOOL)autoFinalize jsonData:(NSString * _Nullable)jsonData;
-/// Reauthorizes the session.
-/// Call this if session details (order or customer info) have changed after authorization.
-/// Merchant’s delegate will be called with successful/unsuccessful result of reauthorization.
-/// \param jsonData An optional json string to update the session.
-///
-- (void)reauthorizeWithJsonData:(NSString * _Nullable)jsonData;
-/// Finalizes the session.
-/// Call this if you called <code>authorize()</code> with <code>autoFinalize</code> set to <code>false</code> and results in
-/// <code>finalizeRequired</code> with a <code>true</code> value.
-/// Merchant’s delegate will be called with successful/unsuccessful result of finalization.
-/// note:
-///
-/// Method is called <code>finalise</code> with an “s” to avoid conflicts with the <code>NSObject</code> method of
-/// the same name.
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)finaliseWithJsonData:(NSString * _Nullable)jsonData;
+
+
+
+
+/// A KlarnaPaymentError describes an error that occurred during any of the stages within the SDK.
+SWIFT_CLASS("_TtC15KlarnaMobileSDK19KlarnaPaymentsError")
+@interface KlarnaPaymentsError : NSObject
+@property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
 
@@ -2220,159 +1419,60 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 @protocol KlarnaWebView;
-@class KlarnaMobileSDKError;
+@protocol KlarnaHybridSDKEventListener;
 
-/// An object that will be notified of events happening to the web views <code>KlarnaHybridSDK</code> instance
-/// is observing.
-/// If you’re performinga hybrid integration, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaHybridSDK</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inWebView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK25KlarnaHybridEventListener_")
-@protocol KlarnaHybridEventListener
-/// Event to notify the merchant app that the supplied web view will present full-screen content
-/// that it should be displayed in a full-screen format.
-/// \param webView Web view to be presented in fullscreen.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaWillShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant app that full-screen content in the supplied web view is now
-/// being displayed.
-/// \param webView Web view that has presented full-screen content.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete.
-///
-- (void)klarnaDidShowFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify the merchant’s app that the full-screen content in the following web view
-/// will be removed, and the “original” contents will be displayed.
-/// \param webView Web view to be restored to original presentation.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaWillHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that the full-screen content in the web view has been removed and
-/// it’s now displaying content in its orignal presentation.
-/// \param webView Web biew presenting content in original format.
-///
-/// \param completionHandler A callback the merchant should call to let the Hybrid SDK know when any
-/// actions addressing this event are complete
-///
-- (void)klarnaDidHideFullscreenInWebView:(id <KlarnaWebView> _Nonnull)webView completionHandler:(void (^ _Nonnull)(void))completionHandler;
-/// Event to notify merchant that an error occured during Hybrid SDK’s usage.
-/// \param webView The web view the error occured in.
-///
-/// \param error Error details.
-///
-- (void)klarnaFailedInWebView:(id <KlarnaWebView> _Nonnull)webView withError:(KlarnaMobileSDKError * _Nonnull)error;
-@end
-
-
-/// Klarna’s approach to integrating products with a “hybrid” approach: One in which Klarna’s
+/// Klarna’s solution to integrating it’s products in a “hybrid” context (one in which Klarna’s)
 /// products are presented inside a merchant-owned web view.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK15KlarnaHybridSDK")
 @interface KlarnaHybridSDK : NSObject
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-+ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
-@end
-
-@protocol KlarnaHybridSDKEventListener;
-
-@interface KlarnaHybridSDK (SWIFT_EXTENSION(KlarnaMobileSDK))
 /// Initialize the Klarna Mobile SDK in hybrid mode.
-/// warning:
-/// This initializer is deprecated. Use the new one and just initialize the SDK and
-/// add the web view you’ll be using.
-/// \param webView A web view (either <code>UIWebView</code> or <code>WKWebView</code>) for Klarna’s SDK to operate on.
+/// \param webView A web view (either UIWebView or WKWebView) for Klarna’s SDK to operate on.
 ///
 /// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
 ///
 /// \param eventListener A listener that will receive events from the SDK.
 ///
-- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener SWIFT_DEPRECATED_MSG("Use the new initializer instead.");
-/// Initialize the Klarna Mobile SDK in hybrid mode.
-/// note:
-/// After initializing the SDK, you’ll need to add the web view that the SDK will track.
-/// \param returnUrl Your app’s custom URL scheme, specified in your app’s <code>CFBundleURLSchemes</code> field in the Info.plist.
-///
-/// \param eventListener A listener that will receive events from the SDK.
-///
-- (nonnull instancetype)initWithReturnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridEventListener> _Nonnull)eventListener;
-/// Adds a web view that the SDK will keep track of until either the web view or the SDK is
-/// dereferenced.
-/// You may add multiple web views to the same instance.
-/// \param webView Web view that the SDK will keep track of (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)addWebView:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, call should be performed in:
-///     <code>webViewDidFinishLoad(_ webView:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, call should be perfomed in:
-///     <code>webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)</code>.
-///   </li>
-/// </ul>
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageLoadIn:(id <KlarnaWebView> _Nonnull)webView;
-/// Notify the SDK that a new page will load in the provided web view.
-/// warning:
-/// Use <code>newPageLoad</code> from this same class instead.
-/// \param webView Web view that the SDK will check (either <code>UIWebView</code> or <code>WKWebView</code>).
-///
-- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView SWIFT_DEPRECATED_MSG("Use the `newPageLoad` instead.");
-/// Verify with the SDK whether a request/navigation should be performed in the web view.
+- (nonnull instancetype)initWithWebView:(id <KlarnaWebView> _Nonnull)webView returnUrl:(NSURL * _Nonnull)returnUrl eventListener:(id <KlarnaHybridSDKEventListener> _Nonnull)eventListener OBJC_DESIGNATED_INITIALIZER;
+/// Notify Klarna Hybrid SDK when a new page will be loaded.
+- (void)newPageWillLoadIn:(id <KlarnaWebView> _Nonnull)webView;
+/// Verify with the SDK whether a web view navigation should be followed in your web view.
+/// If using a <code>UIWebView</code>, checking should be performed in:
+/// <code>webView(_: shouldStartLoadWith: navigationType:)</code>
+/// If using a <code>WKWebView</code>, checking should be perfomed in:
+/// webView(_: decidePolicyFor: decisionHandler:)
+/// with the <code>navigationAction</code>’s <code>request</code> property.
 /// note:
 ///
 /// If it is a page Klarna recognizes as one of its own (e.g. Klarna’s financing terms), the SDK
-/// will return <code>false</code>. You should then block this navigation.
-/// <ul>
-///   <li>
-///     If using a <code>UIWebView</code>, checking should be performed in:
-///     <code>webView(_: shouldStartLoadWith: navigationType:)</code>
-///   </li>
-///   <li>
-///     If using a <code>WKWebView</code>, checking should be perfomed in:
-///     <code>webView(_: decidePolicyFor: decisionHandler:)</code> with the <code>navigationAction</code>’s <code>request</code> property.
-///   </li>
-/// </ul>
+/// will return <code>false</code>. You should block this navigation.
 /// If it’s a page Klarna doesn’t recognize, it’ll fall back to returning <code>true</code>. Your app should
 /// determine whether it wants to load the URL through its own heuristics.
-/// \param request Request the web view will be performing.
+/// \param request the navigation action to handle
 ///
 ///
 /// returns:
-/// Whether the SDK deems that this navigation should be blocked or not.
+/// Whether the Hybrid SDK deems that this navigation should be blocked or not.
 - (BOOL)shouldFollowNavigationWithRequest:(NSURLRequest * _Nonnull)request SWIFT_WARN_UNUSED_RESULT;
 /// Retrieve the SDK’s Device ID for the app install.
-/// warning:
-/// This method is deprecated. Use the static method from <code>KlarnaMobileSDK</code> with the
-/// same name.
 ///
 /// returns:
 /// a unique ID, persistent throughout the app’s installation.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT SWIFT_DEPRECATED_MSG("Use the method of the same name on KlarnaMobileSDK instead.");
++ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 /// To be called when the application is re-opened from a third-party application while the SDK
 /// is running.
-/// warning:
-/// This method is deprecated. The SDK does not require it anymore.
 /// \param url URL that is passed in through deep link.
 ///
 /// \param options Additional system-provided parameters (like source application bundle ID)
 ///
-+ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options SWIFT_DEPRECATED_MSG("SDK does not need this to be called anymore. Will be removed in future releases.");
++ (void)handleDeeplinkWithUrl:(NSURL * _Nonnull)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> * _Nonnull)options;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
+@class KlarnaMobileSDKError;
 
 /// Your app should listen to SDK events in the from the Hybrid SDK by implementing this protocol.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_") SWIFT_DEPRECATED_MSG("Use KlarnaHybridEventListener instead.")
+SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK28KlarnaHybridSDKEventListener_")
 @protocol KlarnaHybridSDKEventListener
 /// Event to notify the merchant app that the following web view will present content that
 /// should be displayed in a full-screen format.
@@ -2426,230 +1526,62 @@ typedef SWIFT_ENUM(NSInteger, KlarnaLoggingLevel, closed) {
 
 
 /// The top level interface for the SDK and all of its components.
-/// Common methods for all integrations are provided here.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK21KlarnaMobileSDKCommon")
 @interface KlarnaMobileSDKCommon : NSObject
 /// MARK: - Life Cycle
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// MARK: - Logging
-/// Set logging level for all SDK integrations.
-/// You can observe these logs either through XCode or the MacOS console.
+/// Set logging level.
 /// The default logging level is <code>error</code>.
 /// \param loggingLevel Console log output level.
 ///
 + (void)setLoggingLevel:(enum KlarnaLoggingLevel)loggingLevel;
-/// MARK: - Device identifier.
-/// Provides a device identifier for an app.
-/// The string it returns remains constant during the app’s lifetime on the app. The value does
-/// not change on updates, but will change on re-installs.
-/// The string is a UUID following the RFC 4122 version 4 standard.
-///
-/// returns:
-/// A unique persisted ID string.
-+ (NSString * _Nonnull)deviceIdentifier SWIFT_WARN_UNUSED_RESULT;
 @end
 
 
-/// Describes a generic error that occurred within the SDK.
+/// A KlarnaMobileSDKError describes an error that occurred during any of the stages within the SDK.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK20KlarnaMobileSDKError")
 @interface KlarnaMobileSDKError : NSObject
+/// Unique name for this error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull name;
+/// Description of the error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull message;
+/// Informs whether this error is fatal. If an error is fatal, the payment view should not be shown any further.
+@property (nonatomic, readonly) BOOL isFatal;
 @property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
-
-/// An SDK error specific to the Klarna Payments component.
-SWIFT_CLASS("_TtC15KlarnaMobileSDK18KlarnaPaymentError")
-@interface KlarnaPaymentError : KlarnaMobileSDKError
-@end
-
-@class KlarnaPaymentView;
-
-/// An object that will be notified of events happening to a <code>KlarnaPaymentView</code>
-/// If you’re integrating Klarna Payments natively, you’ll need to implement an instance of this
-/// listener and initialize the <code>KlarnaPaymentView</code> with it.
-/// warning:
-/// Make sure you listen to to <code>klarnaFailed(inPaymentView:withError:)</code> for potential
-/// fatal and non-fatal errors. If the error is not fatal, you can call the method again.
-SWIFT_PROTOCOL("_TtP15KlarnaMobileSDK26KlarnaPaymentEventListener_")
-@protocol KlarnaPaymentEventListener
-/// The <code>initialize()</code> function for this payment view was successful.
-/// You can follow up by calling <code>load()</code> to render details for this method, or if this payment
-/// method is already authorized, <code>loadPaymentReview()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was initialized.
-///
-- (void)klarnaInitializedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>load()</code> function for this payment view was successful.
-/// Payment view should be visible now. If the user chooses to pay with the payment method in
-/// this view, call <code>authorize()</code>.
-/// \param paymentView The <code>KlarnaPaymentView</code> that was loaded.
-///
-- (void)klarnaLoadedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// The <code>loadPaymentReview()</code> function for this payment view was successful.
-/// Payment view is rendering a description of what the payment method that was authorized.
-/// \param paymentView The <code>KlarnaPaymentView</code> that renders a payment review.
-///
-- (void)klarnaLoadedPaymentReviewWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView;
-/// An authorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// note:
-/// This method being called doesn’t necessarily mean that it was successful. You might need
-/// to call <code>finalize()</code>, you might need to correct an error or there might be a fatal error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the authorized payment method.
-///
-/// \param approved Is the session approved? If true, you should also get an <code>authToken</code>.
-///
-/// \param authToken Authorization token.
-///
-/// \param finalizeRequired If true, <code>finalize()</code> needs to be called.
-///
-- (void)klarnaAuthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken finalizeRequired:(BOOL)finalizeRequired;
-/// A reauthorization was performed for the payment method in the payment view.
-/// If you have an authorization token, you can create an order with your backend at this point.
-/// If the order is changed after this point. Call the view’s <code>reauthorize()</code> instead
-/// of calling <code>authorize()</code> again.
-/// note:
-/// This method being called doesn’t mean that it was necessarily successful. If <code>klarnaAuthorized()</code>
-/// previously returned true for <code>finalizeRequired</code>, you need to still call <code>finalize()</code>. There
-/// might also be an error.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the reauthorized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaReauthorizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// The session for the payment method in this view has performed a finalize.
-/// If it’s approved and you have an authorization token, you can create an order.
-/// note:
-/// You need to check for the <code>authToken</code> to make sure the session is finalized.
-/// \param paymentView The <code>KlarnaPaymentView</code> rendering the finalized payment method.
-///
-/// \param approved Is the session reapproved? If true, you should also get a new <code>authToken</code>.
-///
-/// \param authToken Authorization token. You can use this to create an order.
-///
-- (void)klarnaFinalizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView approved:(BOOL)approved authToken:(NSString * _Nullable)authToken;
-/// Called when a Payment View resized internally.
-/// Update your constraints (or whatever solution you have) to match the layout.
-/// \param paymentView The <code>KlarnaPaymentView</code> that resized.
-///
-/// \param newHeight The new height in points.
-///
-- (void)klarnaResizedWithPaymentView:(KlarnaPaymentView * _Nonnull)paymentView to:(CGFloat)newHeight;
-/// Called if an error occured during some part of the flow.
-/// If the error’s <code>invalidFields</code> property contains field names and the error isn’t fatal, you can:
-/// <ol>
-///   <li>
-///     Prompt the user to get updated info for those fields.
-///   </li>
-///   <li>
-///     Call the same method with those updated fields as additional data.
-///   </li>
-/// </ol>
-/// warning:
-/// Errors may or may not be fatal. If the error is fatal the <code>KlarnaPaymentView</code> should not be
-/// displayed anymore.
-/// \param paymentView The <code>KlarnaPaymentView</code> that the error occured in.
-///
-/// \param error Error that occurred.
-///
-- (void)klarnaFailedInPaymentView:(KlarnaPaymentView * _Nonnull)paymentView withError:(KlarnaPaymentError * _Nonnull)error;
-@end
-
 @class NSCoder;
 
+/// A <code>UIView</code> rendering one of Klarna’s Payment Method Categories.
+/// In addition to rendering a PMC. it also acts as an interface to perform operations on the
+/// PMC it’s rendering.
 SWIFT_CLASS("_TtC15KlarnaMobileSDK17KlarnaPaymentView")
 @interface KlarnaPaymentView : UIView
 /// Mark <code>init(frame:)</code> as <code>private</code> to prevent it being used to initialize the payment view.
 - (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder SWIFT_UNAVAILABLE;
+/// Klarna payment view does not support initialization from storyboard or xib files.
+/// note:
+///
+/// You should never need to initialize a <code>KlarnaPaymentView</code> yourself,
+/// Use <code>KlarnaPaymets</code>’s factory method to make a new instance of <code>KlarnaPaymentView</code>.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
-@interface KlarnaPaymentView (SWIFT_EXTENSION(KlarnaMobileSDK))
-/// Payment method category this view will be / is displaying.
-@property (nonatomic, readonly, copy) NSString * _Nonnull category;
-/// Informs whether this <code>KlarnaPaymentView</code> should be displayed to the customer.
-/// True by default. Once it becomes false, it will not become true again.
-@property (nonatomic, readonly) BOOL isLoaded;
-/// Informs whether this PaymentView’s content is loaded.
-/// Will be false until a successful load() call has been performed.
-@property (nonatomic, readonly) BOOL isAvalable;
-/// Create a Klarna Payment View
-/// note:
-///
-/// Klarna payment view will be initialized with frame <code>.zero</code>,
-/// auto layout is the recommended way to manage the view’s layout.
-/// note:
-///
-/// When the payment view is initialized, this initializer <em>wont</em> call <code>initialize()</code>
-/// automatically. You need to call initialize yourself.
-/// \param category Category of payment methods to be loaded.
-///
-/// \param delegate A listener object that will receive events from this view.
-///
-- (nonnull instancetype)initWithCategory:(NSString * _Nonnull)category eventListener:(id <KlarnaPaymentEventListener> _Nonnull)eventListener;
-/// Initialize the <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// <em>Only</em> call this separately when you get a <code>invalidClientToken</code> error.
-/// \param clientToken Client token received from Klarna when creating the session.
-///
-/// \param returnUrl Your apps custom URL scheme <code>CFBundleURLSchemes</code>.
-///
-- (void)initializeWithClientToken:(NSString * _Nonnull)clientToken returnUrl:(NSURL * _Nonnull)returnUrl;
-/// Performs a pre-assessment for this payment method category. Loads content into the
-/// <code>KlarnaPaymentView</code>.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// \param jsonData An optional string with order data to update the session. Formatted as JSON.
-///
-- (void)loadWithJsonData:(NSString * _Nullable)jsonData;
-/// Renders an overview of the payment terms that have been authorized.
-/// If your checkout offers the customer an opportunity to review the order after the payment
-/// step (e.g. an order review page) it can make sense to present the payment method the customer
-/// selected on a previous page.
-/// This gives the customer a change to review the payment method and its terms to the user.
-/// note:
-///
-/// Any existing content in the view (e.g. if you already called <code>load()</code> before) will be
-/// replaced.
-/// note:
-///
-/// Currently only specific payment methods and countries may be supported.
-/// warning:
-///
-/// The session should be authorized.
-- (void)loadPaymentReview;
-/// Authorizes the session and evaluates whether an order can be created.
-/// Merchant’s delegate will be called with successful/unsuccessful result of authorization.
-/// \param autoFinalize An optional flag used to turn off auto-finalization for the direct bank transfer payment method.
-///
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)authorizeWithAutoFinalize:(BOOL)autoFinalize jsonData:(NSString * _Nullable)jsonData;
-/// Reauthorizes the session.
-/// Call this if session details (order or customer info) have changed after authorization.
-/// Merchant’s delegate will be called with successful/unsuccessful result of reauthorization.
-/// \param jsonData An optional json string to update the session.
-///
-- (void)reauthorizeWithJsonData:(NSString * _Nullable)jsonData;
-/// Finalizes the session.
-/// Call this if you called <code>authorize()</code> with <code>autoFinalize</code> set to <code>false</code> and results in
-/// <code>finalizeRequired</code> with a <code>true</code> value.
-/// Merchant’s delegate will be called with successful/unsuccessful result of finalization.
-/// note:
-///
-/// Method is called <code>finalise</code> with an “s” to avoid conflicts with the <code>NSObject</code> method of
-/// the same name.
-/// \param jsonData An optional string to update the session. Formatted as JSON.
-///
-- (void)finaliseWithJsonData:(NSString * _Nullable)jsonData;
+
+
+
+
+/// A KlarnaPaymentError describes an error that occurred during any of the stages within the SDK.
+SWIFT_CLASS("_TtC15KlarnaMobileSDK19KlarnaPaymentsError")
+@interface KlarnaPaymentsError : NSObject
+@property (nonatomic, readonly, copy) NSString * _Nonnull debugDescription;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
 
