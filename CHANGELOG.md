@@ -4,6 +4,9 @@ All notable changes to Klarna In-App SDK will be documented in this file.
 ## iOS
 Future releases will be documented in this section.
 
+### [2.0.34.1] - 2021-05-28
+- Fixed: WKWebView with contet offscreen when keyboard appears in iOS 13.3 or lower versions (https://bugs.webkit.org/show_bug.cgi?id=192564)
+
 ### [2.0.34] - 2021-03-02
 - Performance improvements: Removed a race condition that happens when the user has a slow network connection.
 
